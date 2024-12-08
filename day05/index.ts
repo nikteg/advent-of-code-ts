@@ -1,12 +1,9 @@
-import { compact, flow, groupBy, mapValues, negate, sum, toNumber } from "lodash-es";
+import { flow, groupBy, mapValues, negate, sum, toNumber } from "lodash-es";
+import { getInput, trimSplit } from "../utils.ts";
 
-let path = import.meta.dir + "/sample.txt";
-path = import.meta.dir + "/input.txt";
+const lines = trimSplit(await getInput(import.meta.dir), "\n\n");
 
-const file = Bun.file(path);
-let text = await file.text();
-
-const [rulesLines, updatesLines] = text.split("\n\n").map((s) => compact(s.split("\n")));
+const [rulesLines, updatesLines] = lines.map((s) => trimSplit(s));
 
 const ruleNumbers = rulesLines.map((rl) => rl.split("|").map(toNumber));
 const updates = updatesLines.map((up) => up.split(",").map(toNumber));
@@ -38,7 +35,9 @@ function sortUpdate(us: Array<number>) {
 }
 
 const part1 = sum(updates.filter(isCorrect).map(getMiddleNumber));
+
 console.log("Part 1", part1);
 
 const part2 = sum(updates.filter(negate(isCorrect)).map(flow([sortUpdate, getMiddleNumber])));
+
 console.log("Part 2", part2);

@@ -1,13 +1,6 @@
-import { compact } from "lodash-es";
+import { getInput, trimSplit } from "../utils.ts";
 
-const PART: 1 | 2 = 2;
-
-let path = import.meta.dir + "/sample.txt";
-path = import.meta.dir + "/input.txt";
-
-const file = Bun.file(path);
-const text = await file.text();
-const lines = compact(text.split("\n"));
+const lines = trimSplit(await getInput(import.meta.dir));
 
 const corruptedMemory = lines.join();
 
@@ -17,7 +10,6 @@ const chars = corruptedMemory.split("");
 let i = 0;
 let x = 0;
 let y = 0;
-let sum = 0;
 let enabled = true;
 let state: State = "read-instruction";
 
@@ -25,28 +17,17 @@ function isNumber(str: string) {
   return !isNaN(Number(str));
 }
 
-function readInstruction() {
-  if (
-    chars[i] === "m" &&
-    chars[i + 1] === "u" &&
-    chars[i + 2] === "l" &&
-    chars[i + 3] === "("
-  ) {
+function readInstruction(part2 = false) {
+  if (chars[i] === "m" && chars[i + 1] === "u" && chars[i + 2] === "l" && chars[i + 3] === "(") {
     i += 3;
     if (enabled) {
       state = "parse-x";
     }
-  } else if (
-    PART === 2 &&
-    chars[i] === "d" &&
-    chars[i + 1] === "o" &&
-    chars[i + 2] === "(" &&
-    chars[i + 3] === ")"
-  ) {
+  } else if (part2 && chars[i] === "d" && chars[i + 1] === "o" && chars[i + 2] === "(" && chars[i + 3] === ")") {
     i += 3;
     enabled = true;
   } else if (
-    PART === 2 &&
+    part2 &&
     chars[i] === "d" &&
     chars[i + 1] === "o" &&
     chars[i + 2] === "n" &&
@@ -79,8 +60,8 @@ function getNumber() {
 }
 
 function summarize() {
-  sum += x * y;
   state = "read-instruction";
+  return x * y;
 }
 
 function parseX() {
@@ -113,6 +94,8 @@ function parseY() {
   i++;
 }
 
+let part1 = 0;
+
 while (i < chars.length) {
   switch (state as State) {
     case "read-instruction":
@@ -125,11 +108,32 @@ while (i < chars.length) {
       parseY();
       break;
     case "summarize":
-      summarize();
+      part1 += summarize();
       break;
   }
-
-  // console.log(state, "x=", x, "y=", y, "sum=", sum);
 }
 
-console.log("Part", PART, sum);
+console.log("Part 1", part1);
+
+i = 0;
+
+let part2 = 0;
+
+while (i < chars.length) {
+  switch (state as State) {
+    case "read-instruction":
+      readInstruction(true);
+      break;
+    case "parse-x":
+      parseX();
+      break;
+    case "parse-y":
+      parseY();
+      break;
+    case "summarize":
+      part2 += summarize();
+      break;
+  }
+}
+
+console.log("Part 2", part2);

@@ -1,13 +1,11 @@
 import { compact, toNumber } from "lodash-es";
+import { getInput, trimSplit } from "../utils.ts";
 
-const PART1 = false;
+const lines = trimSplit(await getInput(import.meta.dir));
 
-let path = import.meta.dir + "/sample.txt";
-path = import.meta.dir + "/input.txt";
-
-const file = Bun.file(path);
-const text = await file.text();
-const lines = compact(text.split("\n"));
+function count(number: number) {
+  return right.filter((r) => r === number).length;
+}
 
 const left: Array<number> = [];
 const right: Array<number> = [];
@@ -19,25 +17,17 @@ lines.forEach((line) => {
   right.push(r);
 });
 
-if (PART1) {
-  left.sort();
-  right.sort();
+left.sort();
+right.sort();
 
-  let sum = 0;
-  left.forEach((l, i) => {
-    sum += Math.abs(l - right[i]);
-  });
+let part1 = 0;
 
-  console.log("Part 1", sum);
-} else {
-  function count(number: number) {
-    return right.filter((r) => r === number).length;
-  }
+left.forEach((l, i) => (part1 += Math.abs(l - right[i])));
 
-  let sum = 0;
-  left.forEach((l, i) => {
-    sum += l * count(l);
-  });
+console.log("Part 1", part1);
 
-  console.log("Part 2", sum);
-}
+let part2 = 0;
+
+left.forEach((l) => (part2 += l * count(l)));
+
+console.log("Part 2", part2);

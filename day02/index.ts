@@ -1,13 +1,7 @@
 import { compact, identity, isEqual, orderBy, toNumber } from "lodash-es";
+import { getInput, trimSplit } from "../utils.ts";
 
-const PART1 = false;
-
-let path = import.meta.dir + "/sample.txt";
-path = import.meta.dir + "/input.txt";
-
-const file = Bun.file(path);
-const text = await file.text();
-const lines = compact(text.split("\n"));
+const lines = trimSplit(await getInput(import.meta.dir));
 
 function isIncreasingOrDecreasing(numbers: Array<number>) {
   return isEqual(orderBy(numbers), numbers) || isEqual(orderBy(numbers, identity, "desc"), numbers);
@@ -33,41 +27,39 @@ function getWithRemovedLevels(numbers: Array<number>) {
   return numbers.map((_, i) => numbers.filter((_, i2) => i !== i2));
 }
 
-if (PART1) {
-  let sum = 0;
+let part1 = 0;
 
-  lines.forEach((line) => {
-    const report = compact(line.split(" ").map(toNumber));
+lines.forEach((line) => {
+  const report = compact(line.split(" ").map(toNumber));
 
-    if (isIncreasingOrDecreasing(report) && hasSafeDistances(report)) {
-      sum += 1;
-    }
-  });
+  if (isIncreasingOrDecreasing(report) && hasSafeDistances(report)) {
+    part1 += 1;
+  }
+});
 
-  console.log("Part 1", sum);
-} else {
-  let sum = 0;
+console.log("Part 1", part1);
 
-  lines.forEach((line) => {
-    const report = compact(line.split(" ").map(toNumber));
+let part2 = 0;
 
-    if (isIncreasingOrDecreasing(report) && hasSafeDistances(report)) {
-      sum += 1;
-    } else {
-      const reports = getWithRemovedLevels(report);
+lines.forEach((line) => {
+  const report = compact(line.split(" ").map(toNumber));
 
-      let isSafeWithDampener = false;
-      reports.forEach((r) => {
-        if (isIncreasingOrDecreasing(r) && hasSafeDistances(r) && !isSafeWithDampener) {
-          isSafeWithDampener = true;
-        }
-      });
+  if (isIncreasingOrDecreasing(report) && hasSafeDistances(report)) {
+    part2 += 1;
+  } else {
+    const reports = getWithRemovedLevels(report);
 
-      if (isSafeWithDampener) {
-        sum += 1;
+    let isSafeWithDampener = false;
+    reports.forEach((r) => {
+      if (isIncreasingOrDecreasing(r) && hasSafeDistances(r) && !isSafeWithDampener) {
+        isSafeWithDampener = true;
       }
-    }
-  });
+    });
 
-  console.log("Part 2", sum);
-}
+    if (isSafeWithDampener) {
+      part2 += 1;
+    }
+  }
+});
+
+console.log("Part 2", part2);
