@@ -16,13 +16,13 @@ const rules = mapValues(
   (v) => v.map((x) => x[0]),
 );
 
-function isBefore(ua: number, ub: number) {
+function isAfter(ua: number, ub: number) {
   return rules[ua] && rules[ua].includes(ub);
 }
 
 function isCorrect(us: Array<number>) {
   for (let i = 0; i < us.length - 1; i++) {
-    if (isBefore(us[i], us[i + 1])) {
+    if (isAfter(us[i], us[i + 1])) {
       return false;
     }
   }
@@ -34,7 +34,7 @@ function getMiddleNumber(us: Array<number>) {
 }
 
 function sortUpdate(us: Array<number>) {
-  return us.toSorted((ua, ub) => (isBefore(ua, ub) ? -1 : isBefore(ub, ua) ? 1 : 0));
+  return us.toSorted((ua, ub) => (isAfter(ua, ub) ? -1 : isAfter(ub, ua) ? 1 : 0));
 }
 
 const part1 = sum(updates.filter(isCorrect).map(getMiddleNumber));
