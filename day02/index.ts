@@ -10,10 +10,7 @@ const text = await file.text();
 const lines = compact(text.split("\n"));
 
 function isIncreasingOrDecreasing(numbers: Array<number>) {
-  return (
-    isEqual(orderBy(numbers), numbers) ||
-    isEqual(orderBy(numbers, identity, "desc"), numbers)
-  );
+  return isEqual(orderBy(numbers), numbers) || isEqual(orderBy(numbers, identity, "desc"), numbers);
 }
 
 function isSafeDistance(num1: number, num2: number) {
@@ -61,11 +58,7 @@ if (PART1) {
 
       let isSafeWithDampener = false;
       reports.forEach((r) => {
-        if (
-          isIncreasingOrDecreasing(r) &&
-          hasSafeDistances(r) &&
-          !isSafeWithDampener
-        ) {
+        if (isIncreasingOrDecreasing(r) && hasSafeDistances(r) && !isSafeWithDampener) {
           isSafeWithDampener = true;
         }
       });

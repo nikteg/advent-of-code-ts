@@ -1,7 +1,4 @@
-import { compact, groupBy, mapValues, sum, toNumber } from "lodash-es";
-
-type Part = 1 | 2;
-const PART: Part = 1 as Part;
+import { compact, flow, groupBy, mapValues, negate, sum, toNumber } from "lodash-es";
 
 let path = import.meta.dir + "/sample.txt";
 path = import.meta.dir + "/input.txt";
@@ -9,9 +6,7 @@ path = import.meta.dir + "/input.txt";
 const file = Bun.file(path);
 let text = await file.text();
 
-const [rulesLines, updatesLines] = text
-  .split("\n\n")
-  .map((s) => compact(s.split("\n")));
+const [rulesLines, updatesLines] = text.split("\n\n").map((s) => compact(s.split("\n")));
 
 const ruleNumbers = rulesLines.map((rl) => rl.split("|").map(toNumber));
 const updates = updatesLines.map((up) => up.split(",").map(toNumber));
@@ -21,20 +16,29 @@ const rules = mapValues(
   (v) => v.map((x) => x[0]),
 );
 
-const totalSum = sum(
-  updates
-    .filter((us) => {
-      for (let i = 0; i < us.length - 1; i++) {
-        const ua = us[i];
-        const ub = us[i + 1];
+function isBefore(ua: number, ub: number) {
+  return rules[ua] && rules[ua].includes(ub);
+}
 
-        if (rules[ua] && rules[ua].includes(ub)) {
-          return false;
-        }
-      }
-      return true;
-    })
-    .map((us) => us[Math.floor(us.length / 2)]),
-);
+function isCorrect(us: Array<number>) {
+  for (let i = 0; i < us.length - 1; i++) {
+    if (isBefore(us[i], us[i + 1])) {
+      return false;
+    }
+  }
+  return true;
+}
 
-console.log("Part 1", totalSum);
+function getMiddleNumber(us: Array<number>) {
+  return us[Math.floor(us.length / 2)];
+}
+
+function sortUpdate(us: Array<number>) {
+  return us.toSorted((ua, ub) => (isBefore(ua, ub) ? -1 : isBefore(ub, ua) ? 1 : 0));
+}
+
+const part1 = sum(updates.filter(isCorrect).map(getMiddleNumber));
+console.log("Part 1", part1);
+
+const part2 = sum(updates.filter(negate(isCorrect)).map(flow([sortUpdate, getMiddleNumber])));
+console.log("Part 2", part2);
