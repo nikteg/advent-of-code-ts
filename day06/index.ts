@@ -19,20 +19,6 @@ outer: for (let y = 0; y < grid.length; y++) {
   }
 }
 
-function printGrid() {
-  for (let y = 0; y < grid.length; y++) {
-    let line = "";
-    for (let x = 0; x < grid[0].length; x++) {
-      if (visited.has(k([x, y]))) {
-        line += "X";
-      } else {
-        line += grid[y][x];
-      }
-    }
-    console.log(line);
-  }
-}
-
 function k(ns: Array<number>) {
   return ns.join(",");
 }
